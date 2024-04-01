@@ -17,7 +17,7 @@ router.use(timeLog)
 
 // define the home page route
 router.post('/login', async (req, res) => {
-    const user = await User.findOne({ where: { userName: req.body.userName } });
+    const user = await User.findOne({ userName: req.body.userName });
     if (user) {
         const password_valid = await bcrypt.compare(req.body.password, user.password);
         if (password_valid) {
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
         }).catch(err => {
             res.status(500).send({
                 status: 'ERROR',
-                errors: err.errors.map(res => res.message)
+                errors: err.message
             })
         })
 })

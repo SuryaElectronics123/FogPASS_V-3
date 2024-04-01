@@ -1,8 +1,8 @@
-const { Sequelize } = require("sequelize");
+const { default: mongoose } = require("mongoose");
 
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: '.temp\\database.sqlite'
+mongoose.connect('mongodb://localhost:27017').then((res) => {
+    module.exports = res;
+}, (err) => {
+
 });
 
-module.exports = sequelize;
