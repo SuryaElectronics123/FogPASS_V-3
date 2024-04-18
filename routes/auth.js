@@ -2,11 +2,8 @@ const express = require('express');
 const User = require('../models/Users');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
 const router = express.Router();
-
-
-dotenv.config();
+const getPrivateKeyVal = require('../security/index');
 
 // middleware that is specific to this router
 const timeLog = (req, res, next) => {
@@ -15,13 +12,20 @@ const timeLog = (req, res, next) => {
 }
 router.use(timeLog)
 
+var privateKeyVal;
+
+getPrivateKeyVal().then(res => {
+    privateKeyVal = res;
+})
+
 // define the home page route
 router.post('/login', async (req, res) => {
-    const user = await User.findOne({ userName: req.body.userName });
+    const user = await User.findOne({ where: { userName: req.body.userName } });
     if (user) {
         const password_valid = await bcrypt.compare(req.body.password, user.password);
         if (password_valid) {
-            let token = jwt.sign({ ...user.dataValues, password: undefined }, process.env.JWT_KEY);
+            let token = jwt.sign(JSON.stringify({ ...user.dataValues, password: undefined }), privateKeyVal);
+            console.log(token);
             res.status(200).json({ token: token });
         } else {
             res.status(400).json({ error: "Password Incorrect" });
