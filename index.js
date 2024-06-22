@@ -45,6 +45,7 @@ app.use((req, res) => {
 // app.use('/routes', routes);
 app.use('/profile', profile);
 app.use('/issues', reportIssues);
+app.use('/routes', routes);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
