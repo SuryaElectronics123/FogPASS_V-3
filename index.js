@@ -7,7 +7,9 @@ const jwt = require('jsonwebtoken');
 const auth = require('./routes/auth');
 const routes = require('./routes/routes');
 const profile = require('./routes/profile');
+const assets = require('./routes/assets');
 const reportIssues = require('./routes/report-issues');
+const captureLoction = require('./routes/capture-location');
 const getPrivateKeyVal = require('./security/index');
 
 
@@ -22,6 +24,8 @@ app.use(cors())
 app.get('/health-check', (req, res) => {
     res.send('success');
 })
+
+app.use('/assets', assets);
 app.use('/auth', auth);
 app.use((req, res) => {
     // req.next()
@@ -46,6 +50,7 @@ app.use((req, res) => {
 app.use('/profile', profile);
 app.use('/issues', reportIssues);
 app.use('/routes', routes);
+app.use('/capture-location', captureLoction);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

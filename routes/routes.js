@@ -16,4 +16,16 @@ router.post('/', (req, res) => {
     })
 })
 
+router.put('/:trainCode', (req, res) => {
+    Routes.update({
+        ...req.body
+    }, {
+        where: {
+            trainCode: req.params.trainCode
+        }
+    }).then(routes => {
+        res.status(200).json(routes);
+    })
+})
+
 module.exports = router;
