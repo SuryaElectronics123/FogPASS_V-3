@@ -3,7 +3,9 @@ const Routes = require('../models/Routes');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    Routes.findAll().then(routes => {
+    Routes.findAll({
+        plain:true
+    }).then(routes => {
         res.status(200).json(routes);
     })
 })

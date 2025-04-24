@@ -11,15 +11,15 @@ const { ConnectionConfiguration } = require('tedious');
 const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize({
     dialect: 'mssql',
-    host:'103.83.81.80',
+    host:'190.92.174.111',
     dialectOptions: {
-        server: '103.83.81.80',
+        server: '190.92.174.111',
         authentication: {
             type: 'default',
             options: {
                 userName: 'skandaso_fogpass',
                 password: 'fogpass@123',
-                serverName:'103.83.81.80',
+                serverName:'190.92.174.111',
                 database:'skandaso_fogpass'
             
             }

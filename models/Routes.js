@@ -61,6 +61,15 @@ const Routes = sequelize.define('Routes', {
         set: function (value) {
             return this.setDataValue("stations", JSON.stringify(value));
         }
+    }, biDirStations: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        get: function () {
+            return JSON.parse(this.getDataValue("biDirStations") ? this.getDataValue("biDirStations") : "[]");
+        },
+        set: function (value) {
+            return this.setDataValue("biDirStations", JSON.stringify(value));
+        }
     },
     id: {
         type: DataTypes.UUID,

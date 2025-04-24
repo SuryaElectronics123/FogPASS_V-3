@@ -8,6 +8,9 @@ const auth = require('./routes/auth');
 const routes = require('./routes/routes');
 const profile = require('./routes/profile');
 const assets = require('./routes/assets');
+const zones = require('./routes/zone');
+const divisions = require('./routes/division');
+const sections = require('./routes/section');
 const reportIssues = require('./routes/report-issues');
 const captureLoction = require('./routes/capture-location');
 const getPrivateKeyVal = require('./security/index');
@@ -27,29 +30,32 @@ app.get('/health-check', (req, res) => {
 
 app.use('/assets', assets);
 app.use('/auth', auth);
-app.use((req, res) => {
-    // req.next()
-    try {
-        if (req.headers.access_token) {
-            if (jwt.verify(req.headers.access_token, privateKeyVal)) {
-                req['userInfo'] = jwt.verify(req.headers.access_token, privateKeyVal);
-                req.next()
-            } else {
-                res.status(401).json({ 'error': 'Access Denied!!' })
-            }
-        } else {
-            res.status(401).json({ 'error': 'Provide access token' })
-        }
+// app.use((req, res) => {
+//     // req.next()
+//     try {
+//         if (req.headers.access_token) {
+//             if (jwt.verify(req.headers.access_token, privateKeyVal)) {
+//                 req['userInfo'] = jwt.verify(req.headers.access_token, privateKeyVal);
+//                 req.next()
+//             } else {
+//                 res.status(401).json({ 'error': 'Access Denied!!' })
+//             }
+//         } else {
+//             res.status(401).json({ 'error': 'Provide access token' })
+//         }
 
-    } catch (error) {
-        res.status(401).json({ 'error': 'Access Denied!!' })
-    }
+//     } catch (error) {
+//         res.status(401).json({ 'error': 'Access Denied!!' })
+//     }
 
-});
+// });
 // app.use('/routes', routes);
 app.use('/profile', profile);
 app.use('/issues', reportIssues);
 app.use('/routes', routes);
+app.use('/zones', zones);
+app.use('/divisions', divisions);
+app.use('/sections', sections);
 app.use('/capture-location', captureLoction);
 
 app.listen(port, () => {
