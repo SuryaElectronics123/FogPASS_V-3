@@ -38,4 +38,10 @@ router.put('/:divisionId', (req, res) => {
     })
 })
 
+router.get('/:divisionId', (req, res) => {
+    Divisions.findOne({ where: { id: req.params.divisionId } }).then(division => {
+        res.status(200).json(division);
+    })
+})
+
 module.exports = router;

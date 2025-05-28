@@ -8,6 +8,12 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/:zoneId', (req, res) => {
+    Zones.findOne({ where: { id: req.params.zoneId } }).then(zone => {
+        res.status(200).json(zone);
+    })
+})
+
 router.post('/', (req, res) => {
     Zones.create({
         ...req.body
@@ -21,7 +27,7 @@ router.put('/:zoneid', (req, res) => {
         ...req.body
     }, {
         where: {
-            id: req.params.id
+            id: req.params.zoneid
         }
     }).then(zones => {
         res.status(200).json(zones);

@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
     Routes.findAll({
-        plain:true
+        plain: true
     }).then(routes => {
         res.status(200).json(routes);
     })

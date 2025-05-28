@@ -18,6 +18,12 @@ router.get('', (req, res) => {
 
 })
 
+router.get('/:routeId', (req, res) => {
+    Sections.findOne({ where: { id: req.params.routeId } }).then(route => {
+        res.status(200).json(route);
+    })
+})
+
 router.post('/', (req, res) => {
     Sections.create({
         ...req.body
