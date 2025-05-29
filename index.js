@@ -9,6 +9,7 @@ const routes = require('./routes/routes');
 const profile = require('./routes/profile');
 const assets = require('./routes/assets');
 const zones = require('./routes/zone');
+const fileupload = require('./routes/fileupload');
 const divisions = require('./routes/division');
 const sections = require('./routes/section');
 const reportIssues = require('./routes/report-issues');
@@ -22,7 +23,7 @@ getPrivateKeyVal().then(res => {
     privateKeyVal = res;
 })
 
-app.use(express.json({limit:'50mb'}));
+app.use(express.json({ limit: '50mb' }));
 app.use(cors())
 app.get('/health-check', (req, res) => {
     res.send('success');
@@ -57,6 +58,7 @@ app.use('/zones', zones);
 app.use('/divisions', divisions);
 app.use('/sections', sections);
 app.use('/capture-location', captureLoction);
+app.use('/fileupload', fileupload);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
