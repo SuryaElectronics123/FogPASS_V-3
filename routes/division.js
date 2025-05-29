@@ -31,15 +31,23 @@ router.put('/:divisionId', (req, res) => {
         ...req.body
     }, {
         where: {
-            id: req.params.id
+            id: req.params.divisionId
         }
-    }).then(zones => {
-        res.status(200).json(zones);
+    }).then(resp => {
+        res.status(200).json(resp);
     })
 })
 
 router.get('/:divisionId', (req, res) => {
     Divisions.findOne({ where: { id: req.params.divisionId } }).then(division => {
+        res.status(200).json(division);
+    })
+})
+
+router.delete('/:divisionId', (req, res) => {
+    Divisions.destroy({
+        where: { id: req.params.divisionId }
+    }).then(division => {
         res.status(200).json(division);
     })
 })
