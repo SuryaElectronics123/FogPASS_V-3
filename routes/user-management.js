@@ -101,7 +101,7 @@ router.post('/login', async (req, res) => {
         );
 
         // Respond with token and user info
-        res.status(200).json({ message: 'Signed in successfully!', token: token, username: user.username });
+        res.status(200).json({ message: 'Signed in successfully!', token: token, username: user.username, scope: user.scope, scopeId: user.scopeId, role: user.role });
 
     } catch (error) {
         console.error('Error during user signin:', error);
