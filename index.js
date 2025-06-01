@@ -4,7 +4,7 @@ const app = express()
 const port = 3000
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const auth = require('./routes/auth');
+const auth = require('./routes/user-management');
 const routes = require('./routes/routes');
 const profile = require('./routes/profile');
 const assets = require('./routes/assets');
@@ -30,7 +30,7 @@ app.get('/health-check', (req, res) => {
 })
 
 app.use('/assets', assets);
-app.use('/auth', auth);
+app.use('/user-management', auth);
 // app.use((req, res) => {
 //     // req.next()
 //     try {

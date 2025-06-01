@@ -1,21 +1,8 @@
-// const { default: mongoose, Schema } = require("mongoose");
-
-// const dbConnection = require('.');
-
-// const User = mongoose.model('User', new Schema({
-//     userName: String,
-//     password: String,
-//     role: String
-// }));
-
-// module.exports = User;
-
 const { DataTypes } = require('sequelize');
-
 const sequelize = require('.');
 const User = sequelize.define('User', {
     // Model attributes are defined here
-    userName: {
+    username: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
@@ -27,6 +14,12 @@ const User = sequelize.define('User', {
     role: {
         type: DataTypes.STRING
     },
+    scope: {
+        type: DataTypes.STRING
+    },
+    scopeId: {
+        type: DataTypes.STRING
+    },
     id: {
         type: DataTypes.UUID,
         primaryKey: true,
@@ -35,7 +28,6 @@ const User = sequelize.define('User', {
 }, {
     // Other model options go here
 });
-
 User.sync();
 
 module.exports = User;
