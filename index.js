@@ -1,9 +1,8 @@
 const express = require('express')
 const cors = require('cors')
+const path = require('path')
 const app = express()
 const port = 3000
-const router = express.Router();
-const jwt = require('jsonwebtoken');
 const auth = require('./routes/user-management');
 const routes = require('./routes/routes');
 const profile = require('./routes/profile');
@@ -24,42 +23,28 @@ getPrivateKeyVal().then(res => {
 })
 
 app.use(express.json({ limit: '50mb' }));
+app.use(express.static(path.join(__dirname, 'fog-pass-admin-ui')));
 app.use(cors())
-app.get('/health-check', (req, res) => {
+
+
+const router = express.Router();
+router.get('/health-check', (req, res) => {
     res.send('success');
 })
-
-app.use('/assets', assets);
-app.use('/user-management', auth);
-// app.use((req, res) => {
-//     // req.next()
-//     try {
-//         if (req.headers.access_token) {
-//             if (jwt.verify(req.headers.access_token, privateKeyVal)) {
-//                 req['userInfo'] = jwt.verify(req.headers.access_token, privateKeyVal);
-//                 req.next()
-//             } else {
-//                 res.status(401).json({ 'error': 'Access Denied!!' })
-//             }
-//         } else {
-//             res.status(401).json({ 'error': 'Provide access token' })
-//         }
-
-//     } catch (error) {
-//         res.status(401).json({ 'error': 'Access Denied!!' })
-//     }
-
-// });
-// app.use('/routes', routes);
-app.use('/profile', profile);
-app.use('/issues', reportIssues);
-app.use('/routes', routes);
-app.use('/zones', zones);
-app.use('/divisions', divisions);
-app.use('/sections', sections);
-app.use('/capture-location', captureLoction);
-app.use('/fileupload', fileupload);
-
+router.use('/assets', assets);
+router.use('/user-management', auth);
+router.use('/profile', profile);
+router.use('/issues', reportIssues);
+router.use('/routes', routes);
+router.use('/zones', zones);
+router.use('/divisions', divisions);
+router.use('/sections', sections);
+router.use('/capture-location', captureLoction);
+router.use('/fileupload', fileupload);
+app.use('/api', router);
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'fog-pass-admin-ui/index.html'));
+});
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
