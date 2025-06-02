@@ -44,4 +44,12 @@ router.put('/:sectionId', (req, res) => {
     })
 })
 
+router.delete('/:sectionId', (req, res) => {
+    Sections.destroy({
+        where: { id: req.params.sectionId }
+    }).then(zones => {
+        res.status(200).json(zones);
+    })
+})
+
 module.exports = router;
