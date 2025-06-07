@@ -28,7 +28,7 @@ const authenticateToken = (req, res, next) => {
 
 // POST /signup - Register a new user
 router.post('/register', async (req, res) => {
-    const { username, password, role, scope, scopeId } = req.body;
+    const { username, password, role, scope, zoneId, divisionId } = req.body;
 
     // Basic input validation
     const missingFields = [];
@@ -37,7 +37,6 @@ router.post('/register', async (req, res) => {
     if (!password) missingFields.push('password');
     if (!role) missingFields.push('role');
     if (!scope) missingFields.push('scope');
-    if (!scopeId) missingFields.push('scopeId');
 
     if (missingFields.length > 0) {
         return res.status(400).json({ message: `Missing required fields: ${missingFields.join(', ')}` });
@@ -59,7 +58,8 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             role,
             scope,
-            scopeId
+            zoneId,
+            divisionId
         });
 
         // Respond with success message (don't send hashed password back)
@@ -97,11 +97,11 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign(
             { id: user.id, username: user.username },
             JWT_SECRET,
-            { expiresIn: '1h' } // Token expires in 1 hour
+            { expiresIn: '2d' } // Token expires in 1 hour
         );
 
         // Respond with token and user info
-        res.status(200).json({ message: 'Signed in successfully!', token: token, username: user.username, scope: user.scope, scopeId: user.scopeId, role: user.role });
+        res.status(200).json({ message: 'Signed in successfully!', token: token, username: user.username, scope: user.scope, userDetails: { ...(user.dataValues), password: undefined } });
 
     } catch (error) {
         console.error('Error during user signin:', error);
@@ -116,7 +116,18 @@ router.post('/login', async (req, res) => {
 router.get('/users', authenticateToken, async (req, res) => {
     console.log('GET /users - Fetching all users (Protected)');
     try {
+        let where = {
+        };
+        if(req.query.zoneId){
+            where['zoneId'] = req.query.zoneId
+        }
+
+        if(req.query.divisionId){
+            where['divisionId'] = req.query.divisionId
+        }
+        
         const users = await User.findAll({
+            where, // Only fetch admin users
             attributes: { exclude: ['password'] } // Exclude password from the response
         });
         res.status(200).json(users);
@@ -148,16 +159,14 @@ router.get('/users/:id', authenticateToken, async (req, res) => {
 // POST /users - Create a new user (Protected route - typically for admin or specific roles)
 // In a real app, this might be restricted to admin users, or only accessible via signup.
 router.post('/users', authenticateToken, async (req, res) => {
-    const { username, password, role, scope, scopeId } = req.body; // Password is required for new user creation
+    const { username, password, scope, zoneId, divisionId } = req.body;
 
     // Basic input validation
     const missingFields = [];
 
     if (!username) missingFields.push('username');
     if (!password) missingFields.push('password');
-    if (!role) missingFields.push('role');
     if (!scope) missingFields.push('scope');
-    if (!scopeId) missingFields.push('scopeId');
 
     if (missingFields.length > 0) {
         return res.status(400).json({ message: `Missing required fields: ${missingFields.join(', ')}` });
@@ -173,9 +182,9 @@ router.post('/users', authenticateToken, async (req, res) => {
         const newUser = await User.create({
             username,
             password: hashedPassword,
-            role,
             scope,
-            scopeId
+            zoneId,
+            divisionId
         });
 
         res.status(201).json({ message: 'User created successfully!', userId: newUser.id, username: newUser.username });

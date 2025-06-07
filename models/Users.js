@@ -17,8 +17,19 @@ const User = sequelize.define('User', {
     scope: {
         type: DataTypes.STRING
     },
-    scopeId: {
-        type: DataTypes.STRING
+    zoneId: {
+        type: DataTypes.STRING,
+        references: {
+            model: 'Zones',
+            key: 'id'
+        }
+    },
+    divisionId: {
+        type: DataTypes.STRING,
+        references: {
+            model: 'Divisions',
+            key: 'id'
+        }
     },
     id: {
         type: DataTypes.UUID,
