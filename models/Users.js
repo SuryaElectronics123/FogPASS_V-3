@@ -1,7 +1,10 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Model } = require('sequelize');
 const sequelize = require('.');
-const User = sequelize.define('User', {
-    // Model attributes are defined here
+const Zones = require('./zone');
+const Divisions = require('./division');
+class User extends Model { }
+
+User.init({
     username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -9,7 +12,6 @@ const User = sequelize.define('User', {
     },
     password: {
         type: DataTypes.STRING
-        // allowNull defaults to true
     },
     role: {
         type: DataTypes.STRING
@@ -19,26 +21,24 @@ const User = sequelize.define('User', {
     },
     zoneId: {
         type: DataTypes.STRING,
-        references: {
-            model: 'Zones',
-            key: 'id'
-        }
+        references: { model: Zones, key: 'id' }
     },
     divisionId: {
         type: DataTypes.STRING,
-        references: {
-            model: 'Divisions',
-            key: 'id'
-        }
+        references: { model: Divisions, key: 'id' }
     },
     id: {
         type: DataTypes.UUID,
         primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: DataTypes.UUIDV4
     }
 }, {
-    // Other model options go here
+    sequelize,
+    modelName: 'User'
 });
-User.sync();
+User.hasOne(Zones, { foreignKey: 'id', sourceKey: 'zoneId' });
+Divisions.hasOne(User, { foreignKey: 'divisionId', sourceKey: 'id' });
+Zones.belongsTo(User, { foreignKey: 'id', targetKey: 'zoneId' });
+User.belongsTo(Divisions, { foreignKey: 'divisionId', targetKey: 'id' });
 
 module.exports = User;

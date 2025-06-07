@@ -1,8 +1,9 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Model } = require('sequelize');
 
 const sequelize = require('.');
-const Divisions = sequelize.define('Divisions', {
-    // Model attributes are defined here
+class Divisions extends Model { }
+
+Divisions.init({
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -17,9 +18,9 @@ const Divisions = sequelize.define('Divisions', {
         defaultValue: DataTypes.UUIDV4,
     }
 }, {
-    // Other model options go here
+    sequelize,
+    modelName: 'Divisions'
 });
-
 Divisions.sync();
 
 module.exports = Divisions;

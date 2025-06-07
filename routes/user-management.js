@@ -1,8 +1,10 @@
 const express = require('express');
-const User = require('../models/Users');
+const User = require('../models/Users.js');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
+const Zones = require('../models/zone');
+const Divisions = require('../models/division');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey'; // Fallback for development
 
@@ -118,16 +120,17 @@ router.get('/users', authenticateToken, async (req, res) => {
     try {
         let where = {
         };
-        if(req.query.zoneId){
+        if (req.query.zoneId) {
             where['zoneId'] = req.query.zoneId
         }
 
-        if(req.query.divisionId){
+        if (req.query.divisionId) {
             where['divisionId'] = req.query.divisionId
         }
-        
+
         const users = await User.findAll({
             where, // Only fetch admin users
+            include: [{ model: Zones }, { model: Divisions }], // Include related zone and division names
             attributes: { exclude: ['password'] } // Exclude password from the response
         });
         res.status(200).json(users);

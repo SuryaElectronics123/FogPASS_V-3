@@ -1,8 +1,9 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Model } = require('sequelize');
 
 const sequelize = require('.');
-const Zones = sequelize.define('Zones', {
-    // Model attributes are defined here
+class Zones extends Model { }
+
+Zones.init({
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -10,10 +11,11 @@ const Zones = sequelize.define('Zones', {
     id: {
         type: DataTypes.UUID,
         primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: DataTypes.UUIDV4
     }
 }, {
-    // Other model options go here
+    sequelize,
+    modelName: 'Zones'
 });
 
 Zones.sync();
