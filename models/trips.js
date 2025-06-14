@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('.');
+const TripSignalDetails = require('./tripSignalDetails');
 
 class Trips extends Model { }
 
@@ -18,7 +19,8 @@ Trips.init({
     },
     endTime: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: new Date(0, 0, 0, 0, 0, 0, 0)
     }, routeId: {
         type: DataTypes.UUID,
         allowNull: false
@@ -52,5 +54,10 @@ Trips.init({
     sequelize,
     modelName: 'Trips'
 });
-Trips.sync();
+Trips.sync().then(() => {
+    console.log('Trips table created successfully');
+    TripSignalDetails.sync();
+}).catch((error) => {
+    console.error('Unable to create table : ', error);
+});
 module.exports = Trips;
