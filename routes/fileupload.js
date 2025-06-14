@@ -41,13 +41,18 @@ router.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }
-    const processedData = validateJSONAndConvertDDMtoDD(processExcelBuffer(req.file.buffer));
+
+    const dataFromExcel = convertIntoRequiredJSON(processExcelBuffer(req.file.buffer));
+    if (dataFromExcel.signals.length === 0 && !dataFromExcel.routeName) {
+        return res.status(400).send({ message: 'The file is empty or does not contain valid data.' });
+    }
+    const processedData = validateJSONAndConvertDDMtoDD(dataFromExcel.signals);
     if (processedData.isErrored) {
         res.status(400).send({ message: 'The file upload failed due to some errors. Please review and correct them before retrying.', filename: req.file.filename, data: processedData.processedData });
     } else {
-        let { name, divisionId } = req.body;
+        let { divisionId } = req.body;
         Sections.create({
-            name,
+            name: dataFromExcel.routeName,
             divisionId,
             signals: processedData.processedData
         }).then(routes => {
@@ -64,7 +69,9 @@ function processExcelBuffer(fileBuffer) {
     const sheetName = workbook.SheetNames[0];
 
     // Convert sheet data to JSON
-    return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+        header: 1
+    });
 }
 
 function validateJSONAndConvertDDMtoDD(data) {
@@ -82,6 +89,37 @@ function validateJSONAndConvertDDMtoDD(data) {
     })
     // Your validation logic here
     return { processedData, isErrored };
+}
+
+function convertIntoRequiredJSON(data) {
+    let output = {
+        routeName: "",
+        signals: []
+    };
+    let order = 1;
+    data.forEach((element, i) => {
+        if (i == 0) {
+            if (element.length > 0 && element[1].length > 0) {
+                output['routeName'] = element[1];
+            }
+            return;
+        } else {
+            if (!element[2]?.startsWith("KM")) {
+                let signal = {
+                    order: order++,
+                    station: element[1],
+                    name: element[2],
+                    code: element[2],
+                    lat: element[5],
+                    lon: element[6]
+                };
+                output.signals.push(signal);
+            } else {
+                output.signals[output.signals.length - 1].KMNumber = element[2];
+            }
+        }
+    });
+    return output;
 }
 
 function validateManadatoryConditionRowJson(rowInfo) {
