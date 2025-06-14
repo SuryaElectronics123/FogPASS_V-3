@@ -39,6 +39,14 @@ Trips.init({
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
+    },
+    totalSignals: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    crossedSignals: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     sequelize,
