@@ -1,5 +1,9 @@
 const express = require('express');
 const Trips = require('../models/trips');
+const User = require('../models/Users');
+const Zones = require('../models/zone');
+const Divisions = require('../models/division');
+const Sections = require('../models/section');
 const router = express.Router();
 
 // ✅ Create Trip
@@ -47,6 +51,33 @@ router.delete('/:id', async (req, res) => {
     try {
         const deleted = await Trips.destroy({ where: { id: req.params.id } });
         deleted ? res.json({ message: "Trip deleted" }) : res.status(404).json({ error: "Trip not found" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/reports', async (req, res) => {
+    try {
+        const trips = await Trips.findAll({
+            include: [{
+                model: Zones,
+                attributes: ['name']
+            },
+            {
+                model: Divisions,
+                attributes: ['name']
+            },
+            {
+                model: Sections,
+                attributes: ['name']
+            },
+        {
+            model:User,
+            attributes: ['username']
+        }]
+        }
+        );
+        res.json(trips);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
