@@ -2,6 +2,7 @@
 
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('.');
+const Trip = require('./trips');
 
 class TripSignalDetails extends Model { }
 
@@ -41,5 +42,14 @@ TripSignalDetails.init({
     modelName: 'TripSignalDetails'
 });
 
+TripSignalDetails.afterCreate(async (tripSignalDetail) => {
+    const trip = await Trip.findByPk(tripSignalDetail.tripId);
+    trip.increment('crossedSignals');
+    if (trip.crossedSignals == 1) {
+        trip.update({ status: 'IN_PROGRESS' });
+    }
+});
+
+TripSignalDetails.sync();
 
 module.exports = TripSignalDetails;
