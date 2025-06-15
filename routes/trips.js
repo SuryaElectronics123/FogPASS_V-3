@@ -1,11 +1,13 @@
 const express = require('express');
+const { writeFile, utils, write } = require('xlsx');
 const Trips = require('../models/trips');
 const User = require('../models/Users');
 const Zones = require('../models/zone');
 const Divisions = require('../models/division');
 const Sections = require('../models/section');
+const { where } = require('sequelize');
+const TripSignalDetails = require('../models/tripSignalDetails');
 const router = express.Router();
-
 // ✅ Create Trip
 router.post('/', async (req, res) => {
     try {
@@ -71,10 +73,10 @@ router.post('/reports', async (req, res) => {
                 model: Sections,
                 attributes: ['name']
             },
-        {
-            model:User,
-            attributes: ['username']
-        }]
+            {
+                model: User,
+                attributes: ['username']
+            }]
         }
         );
         res.json(trips);
@@ -83,4 +85,88 @@ router.post('/reports', async (req, res) => {
     }
 });
 
+router.post('/reports/:tripId', async (req, res) => {
+    try {
+        const details = await tripReport(req);
+        res.json({
+            ...details[0].toJSON(),
+            details: details[1]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/reports/:tripId/export', async (req, res) => {
+    try {
+        const details = await tripReport(req);
+
+        // Convert JSON to worksheet
+        const transformedData = details[1].map(item => {
+            item = item.toJSON();
+            return {
+                "Signal Name": item.signalName,
+                "Latitude": item.lat,
+                "Longitude": item.lon,
+                "Crossing Speed (km/h)": item.crossWithSpeed,
+                "Crossing Time": new Date(item.crossTime).toISOString(),  // Ensures ISO format
+            }
+        });
+        let tripData = details[0].toJSON();
+        const tripSummary = [{
+            "Route Name": tripData.routeName,
+            "Start Time": new Date(tripData.startTime).toISOString(),
+            "End Time": new Date(tripData.endTime).getTime() === new Date(0, 0, 0, 0, 0, 0).getTime() ? '' : new Date(tripData.endTime).toISOString(),
+            "Zone Name": tripData.Zone?.name,
+            "Division Name": tripData.Division?.name,
+            "Section Name": tripData.Section?.name,
+            "Status": tripData.status,
+            "Total Signals": tripData.totalSignals,
+            "Crossed Signals": tripData.crossedSignals,
+            "User": tripData.User?.username
+        }];
+        const workbook = utils.book_new();
+        const sheet1 = utils.json_to_sheet(tripSummary);
+        const sheet2 = utils.json_to_sheet(transformedData.sort((a, b) => new Date(b.crossTime).getTime() - new Date(a.crossTime).getTime()));
+
+        utils.book_append_sheet(workbook, sheet1, "Trip Summary");
+        utils.book_append_sheet(workbook, sheet2, "Signal Details");
+        // Generate Excel file buffer
+        const buffer = write(workbook, { type: "buffer", bookType: "xlsx" });
+
+        // Set headers and send file
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.setHeader("Content-Disposition", "attachment; filename=Trip_Report.xlsx");
+        res.send(buffer);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+function tripReport(req) {
+    return Promise.all([Trips.findOne({
+        where: {
+            id: req.params.tripId
+        },
+        include: [{
+            model: Zones,
+            attributes: ['name']
+        },
+        {
+            model: Divisions,
+            attributes: ['name']
+        },
+        {
+            model: Sections,
+            attributes: ['name']
+        },
+        {
+            model: User,
+            attributes: ['username']
+        }]
+    }
+    ), TripSignalDetails.findAll({ where: { tripId: req.params.tripId } })
+    ]);
+}
 module.exports = router;
