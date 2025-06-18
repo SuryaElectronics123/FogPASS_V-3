@@ -57,27 +57,27 @@ router.put('/:sectionId/signal-update', async (req, res) => {
         let sectionSignals = selectedSection.signals;
 
         // Track actual deleted signals
-        const deletedActual = sectionSignals.filter(signal =>
-            deleted.some(del => del.order === signal.order)
-        );
-        sectionSignals = sectionSignals.filter(signal =>
-            !deleted.some(del => del.order === signal.order)
-        );
+        if (deleted?.length > 0) {
+            sectionSignals = sectionSignals.filter(signal =>
+                !deleted?.some(del => del.order === signal.order)
+            );
+        }
+
 
         // Track actual edited signals
-        const editedActual = sectionSignals.filter(signal =>
-            edited.some(edit => edit.order === signal.order)
-        );
-        sectionSignals = sectionSignals.map(signal => {
-            const editData = edited.find(edit => edit.order === signal.order);
-            return editData ? { ...signal, ...editData } : signal;
-        });
+        if (edited?.length > 0) {
+            sectionSignals = sectionSignals.map(signal => {
+                const editData = edited?.find(edit => edit.order === signal.order);
+                return editData ? { ...signal, ...editData } : signal;
+            });
+        }
+
 
         // Track actual added signals
-        const addedActual = added.filter(signal =>
-            !sectionSignals.some(existing => existing.order === signal.order)
-        );
-        sectionSignals.push(...addedActual);
+        if (added?.length > 0) {
+            sectionSignals.push(...added);
+
+        }
 
         // Sort and reassign order values sequentially
         sectionSignals.sort((a, b) => a.order - b.order);
@@ -98,9 +98,6 @@ router.put('/:sectionId/signal-update', async (req, res) => {
         // Include actual modification counts in response
         res.status(200).json({
             section: updatedSection,
-            deletedCount: deletedActual.length,
-            editedCount: editedActual.length,
-            addedCount: addedActual.length,
             message: "Section signals updated successfully."
         });
 
