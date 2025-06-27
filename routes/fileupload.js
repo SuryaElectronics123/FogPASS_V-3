@@ -103,7 +103,8 @@ function convertIntoRequiredJSON(data) {
         if (i == 0) {
             if (element.length > 0 && element[1].length > 0) {
                 output['routeName'] = element[1];
-            } else if(element.length > 0 && element[3].length > 0) {
+            } 
+            if(element.length > 0 && element[3].length > 0) {
                 output['routeDirection'] = element[3];
             }
             return;
