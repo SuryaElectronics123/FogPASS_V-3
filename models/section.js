@@ -7,6 +7,10 @@ const Sections = sequelize.define('Sections', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    direction: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     divisionId: {
         type: DataTypes.UUID,
         allowNull: false

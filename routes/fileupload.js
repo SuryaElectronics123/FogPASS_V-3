@@ -53,6 +53,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
         let { divisionId } = req.body;
         Sections.create({
             name: dataFromExcel.routeName,
+            direction: dataFromExcel.routeDirection,
             divisionId,
             signals: processedData.processedData
         }).then(routes => {
@@ -94,6 +95,7 @@ function validateJSONAndConvertDDMtoDD(data) {
 function convertIntoRequiredJSON(data) {
     let output = {
         routeName: "",
+        routeDirection: "",
         signals: []
     };
     let order = 1;
@@ -101,6 +103,8 @@ function convertIntoRequiredJSON(data) {
         if (i == 0) {
             if (element.length > 0 && element[1].length > 0) {
                 output['routeName'] = element[1];
+            } else if(element.length > 0 && element[3].length > 0) {
+                output['routeDirection'] = element[3];
             }
             return;
         } else {
