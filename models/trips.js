@@ -53,6 +53,10 @@ Trips.init({
     crossedSignals: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    deviceId: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 }, {
     sequelize,
