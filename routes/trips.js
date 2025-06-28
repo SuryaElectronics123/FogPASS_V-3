@@ -123,7 +123,8 @@ router.get('/reports/:tripId/export', async (req, res) => {
             "Status": tripData.status,
             "Total Signals": tripData.totalSignals,
             "Crossed Signals": tripData.crossedSignals,
-            "User": tripData.User?.username
+            "Loco Pilot ID": tripData.User?.username,
+            "Device ID": tripData.deviceId
         }];
         const workbook = utils.book_new();
         const sheet1 = utils.json_to_sheet(tripSummary);
