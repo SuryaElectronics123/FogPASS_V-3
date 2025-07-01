@@ -102,14 +102,16 @@ router.get('/reports/:tripId/export', async (req, res) => {
         const details = await tripReport(req);
 
         // Convert JSON to worksheet
-        const transformedData = details[1].map(item => {
+        const transformedData = details[1].map((item, i) => {
             item = item.toJSON();
+            nextSignal = details[1][i + 1]?.toJSON();
             return {
+                "Time": new Date(item.crossTime).toISOString(),  // Ensures ISO format
                 "Signal Name": item.signalName,
+                "Speed": item.crossWithSpeed,
                 "Latitude": item.lat,
                 "Longitude": item.lon,
-                "Crossing Speed (km/h)": item.crossWithSpeed,
-                "Crossing Time": new Date(item.crossTime).toISOString(),  // Ensures ISO format
+                "Distance between two signals": distance(item.lat, item.lon, nextSignal?.lat, nextSignal?.lon)
             }
         });
         let tripData = details[0].toJSON();
@@ -169,5 +171,30 @@ function tripReport(req) {
     }
     ), TripSignalDetails.findAll({ where: { tripId: req.params.tripId } })
     ]);
+}
+
+function distance(lat1, lon1, lat2, lon2, unit = 'K') {
+    if (!lat1 || !lat2 || !lon1 || !lon2)
+        return 0
+
+    if ((lat1 == lat2) && (lon1 == lon2)) {
+        return 0;
+    }
+    else {
+        var radlat1 = Math.PI * lat1 / 180;
+        var radlat2 = Math.PI * lat2 / 180;
+        var theta = lon1 - lon2;
+        var radtheta = Math.PI * theta / 180;
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        if (dist > 1) {
+            dist = 1;
+        }
+        dist = Math.acos(dist);
+        dist = dist * 180 / Math.PI;
+        dist = dist * 60 * 1.1515;
+        if (unit == "K") { dist = dist * 1.609344 }
+        if (unit == "N") { dist = dist * 0.8684 }
+        return dist;
+    }
 }
 module.exports = router;
