@@ -102,7 +102,7 @@ router.get('/reports/:tripId/export', async (req, res) => {
         const details = await tripReport(req);
 
         // Convert JSON to worksheet
-        const transformedData = details[1].map((item, i) => {
+        const transformedData = details[1].sort((a, b) => new Date(b.crossTime).getTime() - new Date(a.crossTime).getTime()).map((item, i) => {
             item = item.toJSON();
             nextSignal = details[1][i + 1]?.toJSON();
             return {
