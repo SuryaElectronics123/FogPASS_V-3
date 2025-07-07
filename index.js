@@ -8,6 +8,7 @@ const routes = require('./routes/routes');
 const profile = require('./routes/profile');
 const assets = require('./routes/assets');
 const zones = require('./routes/zone');
+const Cautions = require('./routes/cautions');
 const fileupload = require('./routes/fileupload');
 const divisions = require('./routes/division');
 const sections = require('./routes/section');
@@ -45,6 +46,7 @@ router.use('/capture-location', captureLoction);
 router.use('/fileupload', fileupload);
 router.use('/trips', tripsRoutes);
 router.use('/tripSignalDetails', signalRoutes);
+router.use('/cautions', Cautions);
 app.use('/api', router);
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'fog-pass-admin-ui/index.html'));
