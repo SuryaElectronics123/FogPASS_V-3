@@ -12,11 +12,13 @@ const Cautions = require('./routes/cautions');
 const fileupload = require('./routes/fileupload');
 const divisions = require('./routes/division');
 const sections = require('./routes/section');
+const localizedMessages = require('./routes/LocalizedMessage');
 const reportIssues = require('./routes/report-issues');
 const signalRoutes = require('./routes/tripSignalDetails');
 const tripsRoutes = require('./routes/trips');
 const captureLoction = require('./routes/capture-location');
 const getPrivateKeyVal = require('./security/index');
+
 
 
 var privateKeyVal;
@@ -47,6 +49,7 @@ router.use('/fileupload', fileupload);
 router.use('/trips', tripsRoutes);
 router.use('/tripSignalDetails', signalRoutes);
 router.use('/cautions', Cautions);
+router.use('/localizedMessages', localizedMessages);
 app.use('/api', router);
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'fog-pass-admin-ui/index.html'));
