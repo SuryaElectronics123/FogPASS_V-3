@@ -66,7 +66,7 @@ router.post("/", async (req, res) => {
         lang = "en";
       }
     }
-    const message = await LocalizedMessage.create({ key, value, language:lang });
+    const message = await LocalizedMessage.create({ key, value, language: lang });
     res.status(201).json(message);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -103,7 +103,8 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    const results = [];
+    const imported = [];
+    const errored = [];
 
     for (const row of data) {
       let { key, message, language } = row;
@@ -126,13 +127,13 @@ router.post("/upload", upload.single("file"), async (req, res) => {
           value: message,
           language
         });
-        results.push({ key, language, status: "imported" });
+        imported.push({ key, language, value: message });
       } catch (err) {
-        results.push({ key, language, status: "error", message: err.message });
+        errored.push({ key, language, value: message, message: `A message with key ${key} already exists` });
       }
     }
 
-    res.json({ imported: results.length, details: results });
+    res.json({ importedCount: imported.length, erroredCount: errored.length, imported, errored });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
