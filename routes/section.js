@@ -18,6 +18,24 @@ router.get('', (req, res) => {
 
 })
 
+router.get('/minified', (req, res) => {
+    if (req.query.divisionId) {
+        Sections.findAll({
+            where: req.query.divisionId ? {
+                divisionId: req.query.divisionId
+            } : undefined,
+            attributes:{
+                exclude:['signals']
+            }
+        }).then(zones => {
+            res.status(200).json(zones);
+        })
+    } else {
+        res.status(500).json({ error: "Please select Division to get Sections" });
+
+    }
+})
+
 router.get('/:routeId', (req, res) => {
     Sections.findOne({ where: { id: req.params.routeId } }).then(route => {
         res.status(200).json(route);
