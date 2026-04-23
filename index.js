@@ -28,7 +28,7 @@ getPrivateKeyVal().then(res => {
 })
 
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static(path.join(__dirname, 'fog-pass-admin-ui')));
+//app.use(express.static(path.join(__dirname, 'fog-pass-admin-ui')));
 app.use(cors())
 
 
